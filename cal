@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Rentabilidad Dropshipping</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-color: #1f2937;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 1rem;
+            box-sizing: border-box; /* Asegura que el padding no rompa el ancho */
+            transition: border-color 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .btn-calc {
+            width: 100%;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 1rem;
+            transition: background-color 0.2s;
+        }
+
+        .btn-calc:hover {
+            background-color: #1d4ed8;
+        }
+
+        .results {
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 2px solid #e5e7eb;
+            display: none; /* Oculto hasta calcular */
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .total-profit {
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: #f0fdf4;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .total-profit.negative {
+            background-color: #fef2f2;
+        }
+
+        .total-profit h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            color: #374151;
+        }
+
+        .big-number {
+            display: block;
+            font-size: 2rem;
+            font-weight: bold;
+            margin-top: 0.5rem;
+            color: var(--success-color);
+        }
+
+        .negative .big-number {
+            color: var(--danger-color);
+        }
+
+        .note {
+            font-size: 0.8rem;
+            color: #6b7280;
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Calculadora Dropshipping 📦</h1>
+    
+    <div class="form-group">
+        <label for="salePrice">Precio de Venta al Público ($)</label>
+        <input type="number" id="salePrice" placeholder="Ej: 35.00" step="0.01">
+    </div>
+
+    <div class="form-group">
+        <label for="costPrice">Costo Producto Proveedor ($)</label>
+        <input type="number" id="costPrice" placeholder="Ej: 10.00" step="0.01">
+    </div>
+
+    <div class="form-group">
+        <label for="shippingCost">Costo Promedio de Envío ($)</label>
+        <input type="number" id="shippingCost" placeholder="Ej: 4.50" step="0.01">
+    </div>
+
+    <div class="form-group">
+        <label for="adBudget">Presupuesto Total Publicidad/Ads ($)</label>
+        <input type="number" id="adBudget" placeholder="Ej: 200.00" step="0.01">
+        <div class="note">*Gasto total de la campaña o periodo.</div>
+    </div>
+
+    <div class="form-group">
+        <label for="salesCount">Cantidad de Ventas Realizadas</label>
+        <input type="number" id="salesCount" placeholder="Ej: 20" step="1">
+        <div class="note">*Necesario para calcular el costo real por venta.</div>
+    </div>
+
+    <button class="btn-calc" onclick="calculateProfit()">Calcular Ganancia</button>
+
+    <div class="results" id="resultsSection">
+        <div class="result-item">
+            <span>Ingresos Totales:</span>
+            <span id="totalRevenue" style="font-weight:bold;">$0.00</span>
+        </div>
+        <div class="result-item">
+            <span>Gastos Totales (Prod + Envío + Ads):</span>
+            <span id="totalExpenses">$0.00</span>
+        </div>
+        <div class="result-item">
+            <span>Costo por Adquisición (CPA):</span>
+            <span id="cpaResult">$0.00</span>
+        </div>
+        
+        <div class="total-profit" id="profitBox">
+            <h3>Ganancia Neta Total</h3>
+            <span class="big-number" id="netProfit">$0.00</span>
+            <div style="margin-top: 10px; font-weight: 600;">
+                Margen: <span id="profitMargin">0%</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function calculateProfit() {
+        // 1. Obtener valores
+        const salePrice = parseFloat(document.getElementById('salePrice').value) || 0;
+        const costPrice = parseFloat(document.getElementById('costPrice').value) || 0;
+        const shippingCost = parseFloat(document.getElementById('shippingCost').value) || 0;
+        const adBudget = parseFloat(document.getElementById('adBudget').value) || 0;
+        const salesCount = parseFloat(document.getElementById('salesCount').value) || 0;
+
+        // 2. Validaciones básicas
+        if (salesCount <= 0) {
+            alert("Por favor, ingresa una cantidad de ventas mayor a 0 para calcular los costos unitarios.");
+            return;
+        }
+
+        // 3. Cálculos
+        // Ingreso total = Precio venta * Cantidad
+        const totalRevenue = salePrice * salesCount;
+
+        // Costo de Bienes (COGS) = (Producto + Envío) * Cantidad
+        const totalCOGS = (costPrice + shippingCost) * salesCount;
+
+        // Gastos Totales = COGS + Publicidad
+        const totalExpenses = totalCOGS + adBudget;
+
+        // Ganancia Neta
+        const netProfit = totalRevenue - totalExpenses;
+
+        // Margen %
+        let marginPercent = 0;
+        if (totalRevenue > 0) {
+            marginPercent = (netProfit / totalRevenue) * 100;
+        }
+
+        // CPA (Costo por Adquisición)
+        const cpa = adBudget / salesCount;
+
+        // 4. Mostrar Resultados
+        document.getElementById('resultsSection').style.display = 'block';
+        
+        document.getElementById('totalRevenue').innerText = formatMoney(totalRevenue);
+        document.getElementById('totalExpenses').innerText = formatMoney(totalExpenses);
+        document.getElementById('cpaResult').innerText = formatMoney(cpa);
+        
+        const profitEl = document.getElementById('netProfit');
+        profitEl.innerText = formatMoney(netProfit);
+        document.getElementById('profitMargin').innerText = marginPercent.toFixed(2) + "%";
+
+        // Cambiar color si es pérdida
+        const profitBox = document.getElementById('profitBox');
+        if (netProfit < 0) {
+            profitBox.classList.add('negative');
+        } else {
+            profitBox.classList.remove('negative');
+        }
+    }
+
+    // Función auxiliar para formato moneda
+    function formatMoney(amount) {
+        return "$" + amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+    }
+</script>
+
+</body>
+</html>
